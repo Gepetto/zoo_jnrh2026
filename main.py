@@ -1,4 +1,5 @@
 import os
+
 os.environ["MUJOCO_GL"] = "egl"
 
 import numpy as np
@@ -6,7 +7,7 @@ import mujoco
 from tqdm import tqdm
 from humanoid_task import Humanoid
 from cartpole_task import CartpoleSwingUp
-from evosax.algorithms import CMA_ES, Sep_CMA_ES
+from evosax.algorithms import CMA_ES
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
@@ -58,7 +59,6 @@ for i in tqdm(range(num_generations)):
     metrics_log.append(metrics)
 
 
-
 # Extract the best fitness values across generations
 generations = [metrics["generation_counter"] for metrics in metrics_log]
 best_fitness = [metrics["best_fitness"] for metrics in metrics_log]
@@ -81,17 +81,11 @@ plt.savefig("Figures/cost.png")
 # plt.show()
 
 
-
-
-
-
-
 VISUALIZE = True
 
-if VISUALIZE :
+if VISUALIZE:
     control_traj = state.best_solution.reshape((task.N_STEPS, -1))
     control_traj = np.array(control_traj)
-
 
     import imageio
     import mujoco
@@ -105,15 +99,14 @@ if VISUALIZE :
     mujoco.mj_forward(task.mj_model, data)
     cam = mujoco.MjvCamera()
     if task_name == "humanoid":
-        cam.lookat[:] = data.qpos[:3] 
-        cam.elevation = -15   
+        cam.lookat[:] = data.qpos[:3]
+        cam.elevation = -15
 
     q_traj = []
     v_traj = []
 
     with mujoco.Renderer(task.mj_model, width=640, height=480) as renderer:
         with imageio.get_writer("Figures/rollout.mp4", fps=fps) as writer:
-
             if show_reference:
                 ref_data = mujoco.MjData(task.mj_model)
                 ref_data.qpos[:] = task.q_desired.copy()
@@ -127,17 +120,16 @@ if VISUALIZE :
                 v_traj.append(data.qvel.copy())
                 for _ in range(task.N_HOLD):
                     data.ctrl[:] = control_traj[t]
-                    mujoco.mj_step(task.mj_model, data) 
+                    mujoco.mj_step(task.mj_model, data)
 
                     renderer.update_scene(data, camera=cam)
                     pixels = renderer.render()
 
                     if show_reference:
                         alpha = 0.3
-                        pixels = (
-                            (1 - alpha) * pixels.astype(np.float32)
-                            + alpha * ghost_img
-                        )
+                        pixels = (1 - alpha) * pixels.astype(
+                            np.float32
+                        ) + alpha * ghost_img
                         pixels = np.clip(pixels, 0, 255).astype(np.uint8)
 
                     writer.append_data(pixels)
