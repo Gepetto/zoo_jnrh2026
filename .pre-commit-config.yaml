@@ -1,0 +1,16 @@
+ci:
+  autoupdate_schedule: quarterly
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.16
+  hooks:
+  - id: ruff-check
+  - id: ruff-format
+- repo: https://github.com/pappasam/toml-sort
+  rev: v0.24.4
+  hooks:
+  - id: toml-sort-fix
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: trailing-whitespace
