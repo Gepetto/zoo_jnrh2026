@@ -4,13 +4,13 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
-    "evosax",
-    "imageio[ffmpeg]",
-    "ipykernel",
-    "jax[cpu]",
-    "jupyterlab",
-    "matplotlib",
-    "mujoco",
-    "numpy",
-    "tqdm",
+  "evosax",
+  "imageio[ffmpeg]",
+  "ipykernel",
+  "jax[cpu]",
+  "jupyterlab",
+  "matplotlib",
+  "mujoco",
+  "numpy",
+  "tqdm"
 ]
