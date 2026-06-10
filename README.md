@@ -14,7 +14,7 @@ In this tutorial you will implement three sampling-based trajectory optimizers (
 
 ```bash
 git clone <repo-url>
-cd zoo-tuto
+cd zoo_jnrh2026
 ```
 
 ### 2. Install dependencies
