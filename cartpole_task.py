@@ -25,8 +25,7 @@ class CartpoleSwingUp:
 
         # Initial state
         state_size = mujoco.mj_stateSize(
-            self.mj_model,
-            mujoco.mjtState.mjSTATE_FULLPHYSICS
+            self.mj_model, mujoco.mjtState.mjSTATE_FULLPHYSICS
         )
 
         self.q_init = np.array([0, np.pi])
@@ -34,7 +33,7 @@ class CartpoleSwingUp:
         self.state_init = np.zeros((N_ENVS, state_size))
 
         # Initialize near hanging-down state
-        self.state_init[:, 1:1+self.mj_model.nq] = self.q_init
+        self.state_init[:, 1 : 1 + self.mj_model.nq] = self.q_init
 
         # Desired goal state
         # qpos = [cart_position, pole_angle]
@@ -47,13 +46,11 @@ class CartpoleSwingUp:
         self.w_ctrl = 1e-4
 
         self.x_max = 0.95
-        self.u_max = 2.
+        self.u_max = 2.0
 
         # Held controls
         self.control_hold = np.zeros(
-            (N_ENVS,
-             self.N_STEPS * self.N_HOLD,
-             self.mj_model.nu)
+            (N_ENVS, self.N_STEPS * self.N_HOLD, self.mj_model.nu)
         )
 
     def reset_datas(self):
@@ -64,15 +61,14 @@ class CartpoleSwingUp:
             mujoco.mj_forward(self.mj_model, data)
 
     def state_penalty(self, q):
-        
+
         excess = np.maximum(np.abs(q[:, 0]) - self.x_max, 0.0)
         return 100.0 * excess**2
 
-
     def state_cost(self, q, qvel):
 
-        cart_cost = self.w_cart * q[:, 0]**2
-        pole_cost = self.w_pole * q[:, 1]**2
+        cart_cost = self.w_cart * q[:, 0] ** 2
+        pole_cost = self.w_pole * q[:, 1] ** 2
         vel_cost = self.w_vel * np.sum(qvel**2, axis=1)
 
         return cart_cost + pole_cost + vel_cost
@@ -99,15 +95,14 @@ class CartpoleSwingUp:
             self.mj_datas,
             self.state_init,
             self.control_hold,
-            nstep=self.N_STEPS * self.N_HOLD
+            nstep=self.N_STEPS * self.N_HOLD,
         )
 
         total_cost = np.zeros(self.N_ENVS)
 
         for t in range(self.N_STEPS):
-
             sim_t = (t + 1) * self.N_HOLD - 1
-            qpos = states[:, sim_t, 1:1+self.mj_model.nq]
+            qpos = states[:, sim_t, 1 : 1 + self.mj_model.nq]
             # qvel = states[:, sim_t, 1 + self.mj_model.nq:]
 
             state_c = self.state_penalty(qpos)
@@ -116,10 +111,10 @@ class CartpoleSwingUp:
             total_cost += state_c + ctrl_c
 
         # terminal bonus
-        q_final = states[:, -1, 1:1+self.mj_model.nq]
-        qvel_final = states[:, -1,
-                            1+self.mj_model.nq:
-                            1+self.mj_model.nq+self.mj_model.nv]
+        q_final = states[:, -1, 1 : 1 + self.mj_model.nq]
+        qvel_final = states[
+            :, -1, 1 + self.mj_model.nq : 1 + self.mj_model.nq + self.mj_model.nv
+        ]
 
         total_cost += self.state_cost(q_final, qvel_final)
 
@@ -127,9 +122,7 @@ class CartpoleSwingUp:
 
     def get_warm_start(self):
 
-        return np.zeros(
-            (self.N_STEPS, self.mj_model.nu)
-        )
+        return np.zeros((self.N_STEPS, self.mj_model.nu))
 
     def cost_function(self, control):
 
@@ -138,8 +131,6 @@ class CartpoleSwingUp:
         cost = self.rollout(control)
 
         return cost
-    
-
 
     def plot_solution(self, q_traj, v_traj, control_traj):
         """
