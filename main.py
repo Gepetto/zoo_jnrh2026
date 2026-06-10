@@ -7,7 +7,7 @@ import mujoco
 from tqdm import tqdm
 from humanoid_task import Humanoid
 from cartpole_task import CartpoleSwingUp
-from evosax.algorithms import CMA_ES, Sep_CMA_ES
+from evosax.algorithms import CMA_ES
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
